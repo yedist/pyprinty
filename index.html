@@ -1,25 +1,112 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-    <meta charset="UTF-8">
-    <title>הדף הראשון שלי</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            text-align: center;
-            padding-top: 50px;
-        }
-        h1 {
-            color: #333;
-        }
-        p {
-            color: #555;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>מציג טקסטים</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      direction: rtl; /* הממשק הכללי */
+      font-family: Arial, sans-serif;
+      background-color: #1e1e1e;
+      color: #eee;
+    }
+
+    #menu {
+      position: fixed;
+      right: 0; /* כדי שיהיה בצד ימין */
+      top: 0;
+      width: 25vw;
+      height: 100vh;
+      background-color: #2a2a2a;
+      border-right: 1px solid #444;
+      padding: 20px;
+      overflow-y: auto;
+      z-index: 10;
+    }
+
+    #menu h2 {
+      margin-top: 0;
+      font-size: 1.2em;
+      color: #ccc;
+    }
+
+    #menu ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    #menu li {
+      margin: 10px 0;
+      cursor: pointer;
+      color: #88c0d0;
+    }
+
+    #menu li:hover {
+      color: #81a1c1;
+      text-decoration: underline;
+    }
+
+    #content {
+      margin-right: 25vw; /* מפנה מקום לתפריט בצד ימין */
+      padding: 30px;
+      height: 100vh;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-family: monospace;
+      font-size: 1em;
+      line-height: 1.5;
+
+      direction: ltr;       /* 👈 טקסט משמאל לימין */
+      text-align: left;     /* 👈 יישור שמאלי */
+    }
+  </style>
 </head>
 <body>
-    <h1>שלום עולם!</h1>
-    <p>זהו דף HTML פשוט לדוגמה.</p>
+
+  <div id="menu">
+    <h2>קבצים</h2>
+    <ul id="fileList"></ul>
+  </div>
+
+  <div id="content">
+    לחץ על שם קובץ בתפריט כדי להציג את תוכנו.
+  </div>
+
+  <script>
+    const files = [
+      "main.txt",
+      "exemple.txt",
+      "file.txt"
+    ];
+
+    const fileList = document.getElementById("fileList");
+    const content = document.getElementById("content");
+
+    files.forEach(filename => {
+      const li = document.createElement("li");
+      li.textContent = filename;
+      li.addEventListener("click", () => loadFile(filename));
+      fileList.appendChild(li);
+    });
+
+    async function loadFile(filename) {
+      try {
+        const response = await fetch(filename);
+        if (!response.ok) throw new Error("לא נמצא");
+        const text = await response.text();
+        content.textContent = text;
+      } catch (e) {
+        content.textContent = "שגיאה בטעינת הקובץ: " + e.message;
+      }
+    }
+  </script>
+
 </body>
 </html>
