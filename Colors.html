@@ -1,0 +1,67 @@
+<h2 style="color: green;">colors</h2>
+
+
+<pre style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+font-size: 18px;
+line-height: 1.5;
+color: white;
+">
+Here are two classics you will recognize on this page:
+	• Color - Allows you to create a color.
+	• Colors - Ready-made colors.
+
+Here is a simple example of creating a color and using it:
+<pre style="font-family: monospace; color: white; font-size: 17px; background: black; padding: 10px; border-radius: 5px;">from pyprinty import Color, Colors
+
+
+red = Colors.RED
+print(red.string() + "message in red!")
+
+</pre>
+What happened here?
+I defined a red color, according to the red color ready in the library.
+And you need to understand, Colors.RED, contains a color value in RGB format (expanded later),
+To use an RGB value in a string, it looks like this:
+"\033[38;2;R;G;Bm"
+Don't worry, so you don't get confused with this, I created this library.
+So when we called red.string() it returned the corresponding string according to the color that was defined to it, in this case (255, 0, 0).
+If you understand what RGB and (255, 0, 0) mean, skip the next paragraph.
+
+RGB is a way to represent color, RGB is an acronym for red, green, blue.
+These three colors are called "primary colors" because from their different combinations, any color can be produced.
+If you've heard that the three primary colors are red, blue, and yellow (RYB), that's also true.
+Red, blue, and yellow are the three primary pictorial colors, which are mixed in different amounts to create colors.
+Regarding light, the three primary colors are red, green, and blue.
+In our case, we use RGB because it's a screen, that is, light.
+How do you represent a color in this way?
+Each color represented by RGB will receive three values.
+One expresses red, one green, and one blue. Each of the three values,
+is a number, and it ranges from 0-255.
+This number expresses the intensity for each of the three colors and by combining different intensities, we arrive at different colors, which are all the colors we know.
+0 is the lowest intensity and 255 is the highest, why isn't there more?
+255 is the maximum value for the intensity of the color.
+So regarding what I said at the end of the previous paragraph, the red object's RGB value is set to (255, 0, 0), these are the three values ​​of red, green, and blue in the red object, in order of the initials.
+So within the red object, red is set to maximum, while blue and green are set to minimum, so this is the strongest red that can be achieved.
+If we wanted a weaker red, we would leave the green and blue at 0, and simply lower the value of red according to the strength we want.
+When all colors are at 0, black is obtained, and when all colors are at 255, white is obtained.
+Any combination of the intensities of colors will give a new color.
+
+If you want to create a color yourself, you will use the Color object, and enter the three RGB values ​​into it.
+For example:
+<pre style="font-family: monospace; color: white; font-size: 17px; background: black; padding: 10px; border-radius: 5px;">from pyprinty import Color, Colors
+
+
+red = Color(255, 0, 0)
+print(red.string() + "message in red!")
+
+</pre>
+The red object actually contains the same color as in the previous example, only manually.
+
+Notice that I showed you this because you will use these objects to create colors,
+but,
+I did not intend for you to use the string() method of these objects,
+I showed you this to provide you with an overall understanding.
+How do I expect you to use this? Through a font.
+
+
+</pre>

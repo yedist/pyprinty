@@ -1,39 +1,92 @@
 <!DOCTYPE html>
 <html lang="he">
 <head>
-  <meta charset="UTF-8">
-  <title>מציג טקסטים</title>
+  <meta charset="UTF-8" />
+  <title>pyprinty documentation</title>
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg-color: #1e1e1e;
+      --menu-bg: #2a2a2a;
+      --menu-border: #444;
+      --text-color: #eee;
+      --highlight: #88c0d0;
+      --highlight-hover: #81a1c1;
+      --selected-bg: #3b5360;
+      --transition-speed: 0.3s;
+      --line-guide-color: #444;
+      --button-bg: #2d2d2d;
+      --button-fg: #bbb;
+      --button-hover: #444;
     }
+
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
-      direction: rtl; /* הממשק הכללי */
+      background-color: var(--bg-color);
+      color: var(--text-color);
       font-family: Arial, sans-serif;
-      background-color: #1e1e1e;
-      color: #eee;
+      direction: ltr;
+      overflow: hidden;
+    }
+
+    #menuToggle {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 30;
+      background-color: var(--menu-bg);
+      color: var(--highlight);
+      border: 1px solid var(--menu-border);
+      padding: 8px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all var(--transition-speed);
+      user-select: none;
+    }
+
+    body.menu-open #menuToggle {
+      left: calc(25vw - 10px - 8px - 12px);
+    }
+
+    @media (max-width: 700px) {
+      body.menu-open #menuToggle {
+        left: calc(70vw - 10px - 8px - 12px);
+      }
+    }
+
+    #menuToggle:hover {
+      background-color: var(--highlight-hover);
+      color: white;
     }
 
     #menu {
       position: fixed;
-      right: 0; /* כדי שיהיה בצד ימין */
+      left: 0;
       top: 0;
       width: 25vw;
       height: 100vh;
-      background-color: #2a2a2a;
-      border-right: 1px solid #444;
+      background-color: var(--menu-bg);
+      border-left: 1px solid var(--menu-border);
       padding: 20px;
       overflow-y: auto;
+      box-shadow: inset 5px 0 10px -5px rgba(0, 0, 0, 0.7);
+      transition: transform var(--transition-speed);
       z-index: 10;
+      direction: ltr;
+      text-align: left;
+    }
+
+    #menu.hidden {
+      transform: translateX(-100%);
     }
 
     #menu h2 {
       margin-top: 0;
-      font-size: 1.2em;
+      font-size: 1.4em;
       color: #ccc;
+      user-select: none;
     }
 
     #menu ul {
@@ -43,68 +96,273 @@
     }
 
     #menu li {
-      margin: 10px 0;
+      margin: 12px 0;
       cursor: pointer;
-      color: #88c0d0;
+      color: var(--highlight);
+      padding: 8px 12px;
+      border-radius: 6px;
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+      user-select: none;
     }
 
     #menu li:hover {
-      color: #81a1c1;
-      text-decoration: underline;
+      background-color: var(--highlight-hover);
+      color: #fff;
+    }
+
+    #menu li.selected {
+      background-color: var(--selected-bg);
+      color: #fff;
+      font-weight: bold;
+      box-shadow: 0 0 10px var(--highlight);
+    }
+
+    #contentWrapper {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      overflow: auto;
+      transition: margin-left var(--transition-speed);
+      padding: 30px;
+      box-sizing: border-box;
+      direction: ltr;
+      margin-left: 25vw;
+      background-color: var(--bg-color);
+    }
+
+    #menu.hidden ~ #contentWrapper {
+      margin-left: 0;
+    }
+
+    @media (max-width: 700px) {
+      #menu {
+        width: 70vw;
+      }
+
+      #contentWrapper {
+        margin-left: 70vw;
+      }
+
+      #menu.hidden ~ #contentWrapper {
+        margin-left: 0;
+      }
     }
 
     #content {
-      margin-right: 25vw; /* מפנה מקום לתפריט בצד ימין */
-      padding: 30px;
-      height: 100vh;
-      overflow-y: auto;
-      white-space: pre-wrap;
-      font-family: monospace;
-      font-size: 1em;
-      line-height: 1.5;
+      min-width: fit-content;
+      padding-left: 40px;
+      padding-right: 0;
+      white-space: pre;
+      font-family: 'Fira Code', monospace;
+      font-size: 1.05em;
+      line-height: 1.6;
+      text-align: left;
+      background-color: var(--bg-color);
+      position: relative;
+      direction: ltr;
+    }
 
-      direction: ltr;       /* 👈 טקסט משמאל לימין */
-      text-align: left;     /* 👈 יישור שמאלי */
+    #content::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 15px;
+      width: 1px;
+      background-color: var(--line-guide-color);
+      pointer-events: none;
+    }
+
+    #contentWrapper::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+      background: transparent;
+    }
+
+    #contentWrapper::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #contentWrapper::-webkit-scrollbar-thumb {
+      background-color: rgba(136, 192, 208, 0.6);
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    #contentWrapper::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(136, 192, 208, 0.9);
+    }
+
+    #contentWrapper {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(136, 192, 208, 0.6) transparent;
+    }
+
+    #menu::-webkit-scrollbar {
+      width: 10px;
+      background: transparent;
+    }
+
+    #menu::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    #menu::-webkit-scrollbar-thumb {
+      background-color: rgba(136, 192, 208, 0.6);
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+
+    #menu::-webkit-scrollbar-thumb:hover {
+      background-color: rgba(136, 192, 208, 0.9);
+    }
+
+    #menu {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(136, 192, 208, 0.6) transparent;
+    }
+
+    .nav-buttons {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .nav-buttons button {
+      background-color: var(--button-bg);
+      color: var(--button-fg);
+      border: 1px solid #555;
+      padding: 8px 16px;
+      font-family: monospace;
+      font-size: 0.95em;
+      border-radius: 4px;
+      margin: 0 10px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .nav-buttons button:hover {
+      background-color: var(--button-hover);
+    }
+
+    .nav-buttons button.hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
 
-  <div id="menu">
-    <h2>קבצים</h2>
-    <ul id="fileList"></ul>
+<button id="menuToggle">☰</button>
+
+<div id="menu" class="hidden">
+  <h2>pages</h2>
+  <ul id="fileList"></ul>
+</div>
+
+<div id="contentWrapper">
+  <div id="content">load file...</div>
+  <div class="nav-buttons">
+    <button id="prevBtn">⟵ Previous</button>
+    <button id="nextBtn">Next ⟶</button>
   </div>
+</div>
 
-  <div id="content">
-    לחץ על שם קובץ בתפריט כדי להציג את תוכנו.
-  </div>
+<script>
+  const files = ["Welcome.html", "Library capabilities.html", "Colors.html", "Fonts.html"];
+  const fileList = document.getElementById("fileList");
+  const content = document.getElementById("content");
+  const menu = document.getElementById("menu");
+  const toggleBtn = document.getElementById("menuToggle");
+  const contentWrapper = document.getElementById("contentWrapper");
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
 
-  <script>
-    const files = [
-      "main.txt"
-    ];
+  let currentFileIndex = 0;
 
-    const fileList = document.getElementById("fileList");
-    const content = document.getElementById("content");
+  toggleBtn.addEventListener("click", () => {
+    menu.classList.toggle("hidden");
+    document.body.classList.toggle("menu-open", !menu.classList.contains("hidden"));
+    updateMargin();
+  });
 
-    files.forEach(filename => {
-      const li = document.createElement("li");
-      li.textContent = filename;
-      li.addEventListener("click", () => loadFile(filename));
-      fileList.appendChild(li);
+  window.addEventListener("resize", updateMargin);
+
+  function updateMargin() {
+    if (!menu.classList.contains("hidden")) {
+      document.body.classList.add("menu-open");
+      contentWrapper.style.marginLeft = window.innerWidth < 700 ? "70vw" : "25vw";
+    } else {
+      document.body.classList.remove("menu-open");
+      contentWrapper.style.marginLeft = "0";
+    }
+  }
+
+  function updateSelection() {
+    document.querySelectorAll("#fileList li").forEach(el => el.classList.remove("selected"));
+    const items = document.querySelectorAll("#fileList li");
+    if (items[currentFileIndex]) items[currentFileIndex].classList.add("selected");
+  }
+
+  function updateNavButtons() {
+    prevBtn.classList.toggle("hidden", currentFileIndex <= 0);
+    nextBtn.classList.toggle("hidden", currentFileIndex >= files.length - 1);
+  }
+
+  function loadByIndex(index) {
+    if (index >= 0 && index < files.length) {
+      currentFileIndex = index;
+      loadFile(files[currentFileIndex]);
+      updateSelection();
+      updateNavButtons();
+    }
+  }
+
+  files.forEach((filename, index) => {
+    const li = document.createElement("li");
+    const displayName = filename.replace(/\.[^/.]+$/, "");
+    li.textContent = displayName;
+
+    li.addEventListener("click", () => {
+      currentFileIndex = index;
+      loadFile(filename);
+      updateSelection();
+      updateNavButtons();
+      if (window.innerWidth < 700) menu.classList.add("hidden");
+      updateMargin();
     });
 
-    async function loadFile(filename) {
-      try {
-        const response = await fetch(filename);
-        if (!response.ok) throw new Error("לא נמצא");
-        const text = await response.text();
+    fileList.appendChild(li);
+  });
+
+  async function loadFile(filename) {
+    try {
+      const response = await fetch(filename);
+      if (!response.ok) throw new Error("not found");
+      const text = await response.text();
+      if (filename.toLowerCase().endsWith(".html")) {
+        content.innerHTML = text;
+      } else {
         content.textContent = text;
-      } catch (e) {
-        content.textContent = "שגיאה בטעינת הקובץ: " + e.message;
       }
+	  contentWrapper.scrollTop = 0;
+	contentWrapper.scrollLeft = 0;
+	content.scrollTop = 0;
+	content.scrollLeft = 0;
+      contentWrapper.scrollLeft = 0;
+    } catch (e) {
+      content.textContent = "error file " + e.message;
     }
-  </script>
+  }
+  prevBtn.addEventListener("click", () => loadByIndex(currentFileIndex - 1));
+  nextBtn.addEventListener("click", () => loadByIndex(currentFileIndex + 1));
+  loadByIndex(0);
+  menu.classList.add("hidden");
+  document.body.classList.remove("menu-open");
+  updateMargin();
+</script>
 
 </body>
 </html>
